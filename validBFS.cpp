@@ -179,27 +179,42 @@ int main() {
         graph[node1].push_back(node2);
         graph[node2].push_back(node1);
     }
-    vector<int>bfsArray(nodes,-1);
-    for(int i=0;i<nodes;i++) cin>>bfsArray[i];
-    vector<int>parent(nodes+1, -1);
+    vector<int>bfsArray(nodes,-1), order(nodes+1, -1);
+    for(int i=0;i<nodes;i++) {
+        cin>>bfsArray[i];
+        order[bfsArray[i]]=i;
+    }
+
+    for(int i=1;i<=nodes;i++) {
+        sort(graph[i].begin(), graph[i].end(),[&order](int lt, int rt){
+            return order[lt]<order[rt];
+        });
+    }
+
     queue<int>q;
     q.push(1);
-    parent[1]=0;// To prevent revisit during BFS.
-
+    vector<bool>visited(nodes+1, false);
+    int index=1;
+    bool notBFS=false;
     while(!q.empty()) {
         int curr=q.front();
+        visited[curr]=true;
         q.pop();
         for(int adj: graph[curr]) {
-            if(parent[adj]==-1) {
-                parent[adj]=curr;
+            if(visited[adj]==false) {
+                if(bfsArray[index++]!=adj) {
+                    notBFS=true;
+                    break;
+                }
                 q.push(adj);
             }
         }
+        if(notBFS) break;
     }
 
-    validateBFSArray(bfsArray, graph, parent)?
-    cout<<"Yes"<<endl:
-    cout<<"No"<<endl;
+    (notBFS)?
+    cout<<"No"<<endl:
+    cout<<"Yes"<<endl;
     return 0;
 }
 
